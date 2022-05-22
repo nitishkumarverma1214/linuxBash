@@ -1,0 +1,5 @@
+#user run the confirguration
+user apache 
+
+#group run the config
+Group apache
