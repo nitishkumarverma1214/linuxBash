@@ -1,0 +1,43 @@
+echo '10.9.8.11 server01' | sudo tee -a /etc/hosts
+echo '10.9.8.12 server02' | sudo tee -a /etc/hosts
+
+#To connect with other servers using ssh
+
+# generate a key
+ssh-keygen
+
+#place the public key
+ssh-copy-id server01
+
+# to ssh
+ssh server01
+
+#run a command on server01
+ssh server01 hostname
+
+# loop through
+for N in 1 2 
+do
+	ssh server0${N} hostname
+done
+
+for server in $(cat servers)
+do 
+	ssh ${server} hostname
+ 	ssh ${server} uptime
+done     
+
+#make sure all the commands are executed on remote
+ssh server01 'hostname; uptime'
+
+# using variable for cmd
+CMD1=hostname
+CMD2=uptime
+ssh server01 "${CMD1} ; ${CMD2}"
+
+# the running process
+ssh server02 'ps -ef | head -3'                                      
+
+# ssh exit with the exit status of the remote command or 255 if the ssh has error                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+# running command as root of remote system
+ssh server01 sudo id                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

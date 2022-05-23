@@ -1,0 +1,35 @@
+# Create a local diretory in your system
+mkdir multiusers
+
+#change into the directory
+cd multiusers
+
+#initialize the vagrant
+#jasonc/centos is the image for vagrant
+vagrant init jasonc/centos
+
+#edit the Vagrantfile as per your need.
+#vi ./Vagrantfile
+
+# if <vmname> is skipped then command is executed for all vm.
+
+#To start the vm in headless mode
+vagrant up <vmname>
+
+#To check the status of the vm.
+vagrant status <vmname>
+
+#To connect to that system
+vagrant ssh <vmname>
+
+#To exit out of vm
+exit
+
+#To stop the vm
+vagrant halt <vmname>
+
+#To restart the vm.
+vagrant reload <vmname>
+
+#To delete the vm.
+vagrant destroy <vname>
