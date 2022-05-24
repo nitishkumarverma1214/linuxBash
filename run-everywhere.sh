@@ -1,5 +1,10 @@
 #!/bin/bash
 
+
+#assigning default list of servers
+SERVER_LIST="./servers"
+SSH_OPTION='-o ConnectTimeout=2'
+
 # To execute the command across different system  via ssh
 
 usage(){
@@ -7,7 +12,7 @@ usage(){
 local MESSAGE="${@}"
 echo "${MESSAGE}"
 echo "Usage: ${0} [-nsv] [-f FILE] COMMAND " >&2
-echo "-f FILE Use FILE for the list of servers. Default: /vagrant/servers." >&2
+echo "-f FILE Use FILE for the list of servers. Default: ${SERVER_LIST}" >&2
 echo "-n      Dry run mode. Display the COMMAND that would have been executed and exit." >&2
 echo "-s      Execute the COMMAND using sudo on the remote server." >&2
 echo "-v      Verbose mode. Displays the server name before executing COMMAND." >&2
@@ -21,8 +26,7 @@ then
     usage "Do not execute this script as root. Use the -s option instead."
 fi
 
-#assigning default list of servers
-SERVER_LIST="./servers"
+
 
 #Processing all the options
 while getopts nsf:v OPTION
@@ -66,21 +70,37 @@ fi
 # assigning all the remaining arguments as command.
 COMMAND="${@}"
 
+#variable for exit status.
+EXIT_STATUS='0'
+
 # loop through the server and perform the command.
-cat "${SERVER_LIST}" | while read SERVER
-#for SERVER in $(cat SERVER_LIST)
+
+#cat "${SERVER_LIST}" | while read SERVER
+for SERVER in $(cat ${SERVER_LIST})
 do
     if [[ "${VERBOSE}" = 'true' ]]
     then
         echo "${SERVER}"
     fi
 
+    SSH_COMMAND="ssh -o ConnectTimeout=2 ${SERVER} ${PREVILAGE} ${COMMAND}"
     if [[ "${DRY_RUN}" = 'true' ]]
     then
-        echo "DRY RUN: ssh -o ConnectTimeout=2 ${SERVER} ${PREVILAGE} ${COMMAND}"
+        echo "DRY RUN: ${SSH_COMMAND}"
     else
-        ssh -o ConnectTimeout=2 ${SERVER} ${PREVILAGE} ${COMMAND}
+        ${SSH_COMMAND}
+        SSH_EXIT_STATUS="${?}"
+    
+    #Capture any non-zero exit status from SSH command.
+    
+    
+    if [[ "${SSH_EXIT_STATUS}" -ne 0 ]]
+    then
+        EXIT_STATUS="${SSH_EXIT_STATUS}"
+        echo "Execution on ${SERVER} failed" >&2
+    fi
+
     fi
 done
 
-exit 0
+exit "${EXIT_STATUS}"
